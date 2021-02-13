@@ -1,7 +1,4 @@
-# Python CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-python/ for more details
-#
+
 version: 2
 jobs:
   build:
@@ -41,3 +38,16 @@ jobs:
           command: |
             . venv/bin/activate
             make lint
+
+      - run:
+          name: build image
+          command: |
+            . venv/bin/activate
+            docker build --tag=ykankane/easy_app .
+            docker image ls
+
+      - run:
+          name: push image
+          command: |
+            docker login -u $DOCUSER -p $DOCPASS
+            docker push ykankane/easy_app
