@@ -59,9 +59,6 @@ jobs:
       - run:
           name: build image
           command: |
-            ls -la /var/run/docker.sock
-            chown $USER /var/run/docker.sock
-            # usermod -aG docker ($USER)
             systemctl start docker
             docker build --tag=ykankane/easy_app:v1 .
             docker image ls
