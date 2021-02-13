@@ -48,7 +48,7 @@ jobs:
       - run:
           name: build image
           command: |
-            sudo apt-get install docker-cli
+            apt-get install docker-cli
             docker build --tag=ykankane/easy_app:v1 .
             docker image ls
 
