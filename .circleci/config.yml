@@ -41,9 +41,7 @@ jobs:
 
 
   build:
-    docker:
-      # Use the same Docker base as the project
-      machine: true
+    machine: true
 
     working_directory: ~/repo
 
