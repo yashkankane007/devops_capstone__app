@@ -54,6 +54,7 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update docker-cli
+            dockerd
 
       - run:
           name: build image
