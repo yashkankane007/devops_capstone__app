@@ -48,7 +48,6 @@ jobs:
       - run:
           name: build image
           command: |
-            . venv/bin/activate
             docker build --tag=ykankane/easy_app:v1 .
             docker image ls
 
