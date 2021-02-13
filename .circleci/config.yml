@@ -7,7 +7,7 @@ jobs:
       - image: python:3.7.3-stretch
 
     working_directory: ~/repo
-
+    machine: true
     steps:
       - checkout
 
@@ -43,11 +43,11 @@ jobs:
           name: build image
           command: |
             . venv/bin/activate
-            docker build --tag=ykankane/easy_app .
+            docker build --tag=ykankane/easy_app:v1 .
             docker image ls
 
       - run:
           name: push image
           command: |
-            docker login -u $DOCUSER -p $DOCPASS
-            docker push ykankane/easy_app
+            echo "$DOCPASS" | docker login --username $DOCUSER --password-stdin
+            docker push ykankane/easy_app:v1
