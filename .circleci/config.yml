@@ -1,7 +1,7 @@
 
 version: 2
 jobs:
-  build:
+  lint:
     docker:
       # Use the same Docker base as the project
       - image: python:3.7.3-stretch
@@ -39,11 +39,25 @@ jobs:
             . venv/bin/activate
             make lint
 
+
+  build:
+    docker:
+      # Use the same Docker base as the project
+      - image: python:3.7-alpine3.11
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update docker-cli
+
       - run:
           name: build image
           command: |
-            apt-get update
-            apt-get install docker-ce docker-ce-cli containerd.io
             docker build --tag=ykankane/easy_app:v1 .
             docker image ls
 
@@ -52,3 +66,10 @@ jobs:
           command: |
             echo $DOCPASS | docker login --username $DOCUSER --password-stdin
             docker push ykankane/easy_app:v1
+
+workflows:
+  default:
+    jobs:
+      - lint
+      - build:
+          requires: [lint]
