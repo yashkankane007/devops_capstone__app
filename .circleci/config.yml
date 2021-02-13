@@ -5,9 +5,9 @@ jobs:
     docker:
       # Use the same Docker base as the project
       - image: python:3.7.3-stretch
-        auth:
-          username: $DOCUSER
-          password: $DOCPASS
+        # auth:
+        #   username: $DOCUSER
+        #   password: $DOCPASS
 
     working_directory: ~/repo
 
@@ -42,12 +42,13 @@ jobs:
             . venv/bin/activate
             make lint
 
-      - setup_remote_docker:
-          version: 20.10.2
+      # - setup_remote_docker:
+      #     version: 20.10.2
 
       - run:
           name: build image
           command: |
+            sudo apt-get install docker-cli
             docker build --tag=ykankane/easy_app:v1 .
             docker image ls
 
