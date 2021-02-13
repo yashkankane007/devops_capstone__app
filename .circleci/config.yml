@@ -5,9 +5,12 @@ jobs:
     docker:
       # Use the same Docker base as the project
       - image: python:3.7.3-stretch
+        auth:
+          username: $DOCUSER
+          password: $DOCPASS
 
     working_directory: ~/repo
-    
+
     steps:
       - checkout
 
@@ -39,16 +42,19 @@ jobs:
             . venv/bin/activate
             make lint
 
+      - setup_remote_docker:
+          version: 20.10.2
+          docker_layer_caching: true
+
       - run:
           name: build image
           command: |
             . venv/bin/activate
-            apk add --update docker-cli
             docker build --tag=ykankane/easy_app:v1 .
             docker image ls
 
       - run:
           name: push image
           command: |
-            echo "$DOCPASS" | docker login --username $DOCUSER --password-stdin
+            echo $DOCPASS | docker login --username $DOCUSER --password-stdin
             docker push ykankane/easy_app:v1
