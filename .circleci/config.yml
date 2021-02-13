@@ -59,7 +59,7 @@ jobs:
       - run:
           name: build image
           command: |
-            systemctl start docker
+            usermod -aG docker $USER
             docker build --tag=ykankane/easy_app:v1 .
             docker image ls
 
