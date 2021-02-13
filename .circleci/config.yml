@@ -39,7 +39,6 @@ jobs:
             . venv/bin/activate
             make lint
 
-
   build:
     machine: true
 
@@ -48,27 +47,38 @@ jobs:
     steps:
       - checkout
 
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       apk add --update docker-cli
-      #       dockerd
-
       - run:
           name: build image
           command: |
-            docker build --tag=ykankane/easy_app:v1 .
+            docker build --tag=ykankane/easy_app:${CIRCLE_WORKFLOW_ID:0:7} .
             docker image ls
 
       - run:
           name: push image
           command: |
             echo $DOCPASS | docker login --username $DOCUSER --password-stdin
-            docker push ykankane/easy_app:v1
+            docker push ykankane/easy_app:${CIRCLE_WORKFLOW_ID:0:7}
+
+  create-cluster:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add curl
+            apk add --update npm
+            pip install awscli
+      - run:
+          name: Get backend url
+          command: |
+            aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE
 
 workflows:
   default:
     jobs:
       - lint
-      - build:
-          requires: [lint]
+      # - build:
+      #     requires: [lint]
+      - create-cluster
