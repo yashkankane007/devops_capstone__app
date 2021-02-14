@@ -134,7 +134,7 @@ jobs:
           name: rollout new version
           command: |
             . venv/bin/activate
-            kubectl set image deployments/easy-app-deploy easy-app=$DOCUSER/easy_app:v2
+            kubectl set image deployments/easy-app-deploy easy-app=ykankane/easy_app:v2
             kubectl rollout status deployments/easy-app-deploy
             kubectl describe deployments
 
