@@ -50,14 +50,14 @@ jobs:
       - run:
           name: build image
           command: |
-            docker build --tag=ykankane/easy_app:${CIRCLE_WORKFLOW_ID:0:7} .
+            docker build --tag=ykankane/easy_app:v2 .
             docker image ls
 
       - run:
           name: push image
           command: |
             echo $DOCPASS | docker login --username $DOCUSER --password-stdin
-            docker push ykankane/easy_app:${CIRCLE_WORKFLOW_ID:0:7}
+            docker push ykankane/easy_app:v2
 
   create-infra:
     docker:
@@ -103,10 +103,44 @@ jobs:
             chmod +x /usr/local/bin/eksctl
             eksctl version
 
+      - run:
+          name: create EKSCTL cluster
+          command: |
+            . venv/bin/activate
+            # creates cloudFormation Stack for AWS EKS cluster
+            eksctl create cluster \
+              --name easy-cluster \
+              --region us-west-2 \
+              --nodegroup-name easy-nodes \
+              --with-oidc \
+              --ssh-access \
+              --ssh-public-key udacity \
+              --node-type t2.micro \
+              --managed
+            
+            aws eks --region us-west-2 update-kubeconfig --name easy-cluster
+
+      - run:
+          name: create k8 deployment and service
+          command: |
+            . venv/bin/activate
+            kubectl apply -f k8_config.yaml
+            kubectl describe deployments
+            kubectl get services
+
+      - run:
+          name: rollout new version
+          command: |
+            . venv/bin/activate
+            kubectl set image deployments/easy-app-deploy easy-app=$DOCUSER/easy_app:v2
+            kubectl rollout status deployments/easy-app-deploy
+            kubectl describe deployments
+
 workflows:
   default:
     jobs:
       - lint
-      # - build:
-      #     requires: [lint]
-      - create-infra
+      - build:
+          requires: [lint]
+      - create-infra:
+          requires: [build]
