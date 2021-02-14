@@ -81,6 +81,7 @@ jobs:
             chmod +x ./kubectl
             mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
             echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
+            mv ./kubectl /usr/local/bin
             kubectl version --short --client
 
       - run:
@@ -108,16 +109,17 @@ jobs:
           command: |
             . venv/bin/activate
             # creates cloudFormation Stack for AWS EKS cluster
-            eksctl create cluster \
-              --name easy-cluster \
-              --region us-west-2 \
-              --nodegroup-name easy-nodes \
-              --with-oidc \
-              --ssh-access \
-              --ssh-public-key udacity \
-              --node-type t2.micro \
-              --managed
+            # eksctl create cluster \
+            #   --name easy-cluster \
+            #   --region us-west-2 \
+            #   --nodegroup-name easy-nodes \
+            #   --with-oidc \
+            #   --ssh-access \
+            #   --ssh-public-key udacity \
+            #   --node-type t2.micro \
+            #   --managed
             
+            kubectl version --short --client
             aws eks --region us-west-2 update-kubeconfig --name easy-cluster
 
       - run:
@@ -139,8 +141,9 @@ jobs:
 workflows:
   default:
     jobs:
-      - lint
-      - build:
-          requires: [lint]
-      - create-infra:
-          requires: [build]
+      - create-infra
+      # - lint
+      # - build:
+      #     requires: [lint]
+      # - create-infra:
+      #     requires: [build]
