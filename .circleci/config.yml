@@ -108,16 +108,16 @@ jobs:
           name: create EKSCTL cluster
           command: |
             . venv/bin/activate
-            # creates cloudFormation Stack for AWS EKS cluster
-            # eksctl create cluster \
-            #   --name easy-cluster \
-            #   --region us-west-2 \
-            #   --nodegroup-name easy-nodes \
-            #   --with-oidc \
-            #   --ssh-access \
-            #   --ssh-public-key udacity \
-            #   --node-type t2.micro \
-            #   --managed
+            creates cloudFormation Stack for AWS EKS cluster
+            eksctl create cluster \
+              --name easy-cluster \
+              --region us-west-2 \
+              --nodegroup-name easy-nodes \
+              --with-oidc \
+              --ssh-access \
+              --ssh-public-key udacity \
+              --node-type t2.micro \
+              --managed
             
             kubectl version --short --client
             aws eks --region us-west-2 update-kubeconfig --name easy-cluster
@@ -141,9 +141,8 @@ jobs:
 workflows:
   default:
     jobs:
-      - create-infra
-      # - lint
-      # - build:
-      #     requires: [lint]
-      # - create-infra:
-      #     requires: [build]
+      - lint
+      - build:
+          requires: [lint]
+      - create-infra:
+          requires: [build]
